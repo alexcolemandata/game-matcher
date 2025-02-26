@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://gqk581qj7hub"]
+
+[ext_resource type="Script" path="res://Board.gd" id="1_fd0w8"]
+
+[node name="Main" type="Node2D"]
+
+[node name="LayerHolder" type="Node2D" parent="."]
+script = ExtResource("1_fd0w8")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="Score" type="Label" parent="."]
+unique_name_in_owner = true
+offset_left = -306.0
+offset_top = -314.0
+offset_right = 305.0
+offset_bottom = -177.0
+theme_override_font_sizes/font_size = 100
+text = "START GAME"
