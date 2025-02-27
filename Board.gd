@@ -1,11 +1,14 @@
 extends Node2D
 
 const DEFAULT_LAYER = preload("res://default_layer.tscn")
-const MIN_TILES_TO_SCORE = 4
-const MAX_PIECE_SIZE = 5
+const MIN_TILES_TO_SCORE = 3
+const MAX_PIECE_SIZE = 12
 const HEIGHT = 18
 const WIDTH = 40
 const MAIN_SOURCE_ID = 0
+
+const PLACABLE_ALPHA = 0.6
+const UNPLACABLE_ALPHA = 0.1
 
 const LIGHT_BLUE_TILE = Vector2i(0, 0)
 const PURPLE_TILE = Vector2i(1, 0)
@@ -17,9 +20,7 @@ const BLUE_TILE = Vector2i(6, 0)
 const GREY_TILE = Vector2i(7, 0)
 const TILES = [
 	LIGHT_BLUE_TILE, 
-	PURPLE_TILE, 
 	YELLOW_TILE, 
-	RED_TILE, 
 	GREEN_TILE, 
 	ORANGE_TILE, 
 	BLUE_TILE, 
@@ -34,6 +35,7 @@ var score = 0
 func _ready():
 	placed_tiles = DEFAULT_LAYER.instantiate()
 	active_piece = DEFAULT_LAYER.instantiate()
+	active_piece.modulate = Color(1, 1, 1, 0.3)
 	border = DEFAULT_LAYER.instantiate()
 	add_child(border)
 	add_child(placed_tiles)
@@ -45,21 +47,32 @@ func _ready():
 
 func _input(event) -> void:
 	if event.is_action_pressed("spawn piece"):
-		place_piece()
-		clear_scored_pieces()
-		spawn_piece()
-	elif event.is_action_pressed("down"):
-		move_piece(Vector2i(0, 1))
-	elif event.is_action_pressed("up"):
-		move_piece(Vector2i(0, -1))
-	elif event.is_action_pressed("left"):
-		move_piece(Vector2i(-1, 0))
-	elif event.is_action_pressed("right"):
-		move_piece(Vector2i(1, 0))
+		if is_piece_placable():
+			place_piece()
+			clear_scored_pieces()
+			spawn_piece()
 	elif event.is_action_pressed("rotate anticlockwise"):
 		rotate_anticlockwise()
 	elif event.is_action_pressed("rotate clockwise"):
 		rotate_clockwise()
+	
+func is_piece_placable() -> bool:
+		for cell in get_piece_coords():
+			if placed_tiles.get_cell_tile_data(cell):
+				return false
+		return true
+	
+		
+func input_handler(event_or_input) -> void:
+	if event_or_input.is_action_pressed("down"):
+		move_piece(Vector2i(0, 1))
+	if event_or_input.is_action_pressed("up"):
+		move_piece(Vector2i(0, -1))
+	if event_or_input.is_action_pressed("left"):
+		move_piece(Vector2i(-1, 0))
+	if event_or_input.is_action_pressed("right"):
+		move_piece(Vector2i(1, 0))
+	
 
 var num_steps: int = 0
 const MAX_STEPS: int = 10
@@ -72,7 +85,7 @@ func _process(delta) -> void:
 	):
 		num_steps += 1
 		if num_steps >= MAX_STEPS:
-			_input(Input)
+			input_handler(Input)
 			num_steps = 0
 	
 
@@ -183,7 +196,7 @@ func rotate_piece(c_x: int, c_y: int) -> void:
 			c_y * relative_coord.x
 		) + anchor_point
 		
-		if placed_tiles.get_cell_tile_data(new_coord) or border.get_cell_tile_data(new_coord):
+		if border.get_cell_tile_data(new_coord):
 			print("unable to rotate ", c_x, c_y)
 			return 
 	
@@ -192,7 +205,8 @@ func rotate_piece(c_x: int, c_y: int) -> void:
 	active_piece.clear()
 	for i in range(new_coords.size()):
 		draw_coords(active_piece, new_coords[i], piece_colors[i])
-		
+	
+	set_piece_alpha()	
 	pass
 	
 
@@ -209,7 +223,7 @@ func get_piece_coords() -> Array[Vector2i]:
 func place_piece() -> void:
 	var piece_cells = get_piece_coords()
 	var piece_colors = get_layer_colors(active_piece)
-		
+	
 	for i in range(piece_cells.size()):
 		draw_coords(
 			placed_tiles,
@@ -236,12 +250,17 @@ func spawn_piece() -> void:
 	for coord in coords:
 		draw_coords(active_piece, coord, roll_color())
 			
+	set_piece_alpha()
 	print("spawned piece")
+	
+func set_piece_alpha():
+	if is_piece_placable():
+		active_piece.modulate = Color(1, 1, 1, PLACABLE_ALPHA)
+	else:
+		active_piece.modulate = Color(1, 1, 1, UNPLACABLE_ALPHA)
 		
 func can_move_in_direction(direction: Vector2i) -> bool:
 	for cell in active_piece.get_used_cells():
-		if placed_tiles.get_cell_tile_data(cell + direction):
-			return false
 		if border.get_cell_tile_data(cell + direction):
 			return false
 	
@@ -262,6 +281,8 @@ func move_piece(direction: Vector2i) -> void:
 		var old_coords = current_cells[i]
 		var color = colors[i]
 		draw_coords(active_piece, old_coords + direction, color)
+		
+	set_piece_alpha()
 	
 			
 func roll_color() -> Vector2i:
