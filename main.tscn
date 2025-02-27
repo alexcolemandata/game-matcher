@@ -7,13 +7,16 @@
 [node name="LayerHolder" type="Node2D" parent="."]
 script = ExtResource("1_fd0w8")
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="LayerHolder"]
+unique_name_in_owner = true
+zoom = Vector2(1.015, 1.015)
+position_smoothing_enabled = true
 
 [node name="Score" type="Label" parent="."]
 unique_name_in_owner = true
-offset_left = -306.0
-offset_top = -314.0
-offset_right = 305.0
-offset_bottom = -177.0
+offset_left = -307.0
+offset_top = -414.0
+offset_right = 304.0
+offset_bottom = -277.0
 theme_override_font_sizes/font_size = 100
 text = "START GAME"

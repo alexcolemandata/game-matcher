@@ -1,11 +1,11 @@
 extends Node2D
 
 const DEFAULT_LAYER = preload("res://default_layer.tscn")
-const MIN_TILES_TO_SCORE = 4
+const MIN_TILES_TO_SCORE = 3
 const PIECE_SIZE_X = 3
 const PIECE_SIZE_Y = 2
-const HEIGHT = 10
-const WIDTH = 20
+const HEIGHT = 18
+const WIDTH = 40
 const MAIN_SOURCE_ID = 0
 
 const LIGHT_BLUE_TILE = Vector2i(0, 0)
@@ -24,20 +24,23 @@ const TILES = [
 	GREEN_TILE, 
 	ORANGE_TILE, 
 	BLUE_TILE, 
-	GREY_TILE
 ]
 
+var border: TileMapLayer
 var placed_tiles: TileMapLayer
 var active_piece: TileMapLayer
-
 var score = 0
+
 
 func _ready():
 	placed_tiles = DEFAULT_LAYER.instantiate()
 	active_piece = DEFAULT_LAYER.instantiate()
+	border = DEFAULT_LAYER.instantiate()
+	add_child(border)
 	add_child(placed_tiles)
 	add_child(active_piece)
 	
+	init_border()
 	spawn_piece()
 
 func _input(event) -> void:
@@ -58,7 +61,33 @@ func _input(event) -> void:
 	if event.is_action_pressed("rotate clockwise"):
 		rotate_clockwise()
 
+func init_border() -> void:
+	print("init_border")
+	var half_height = int(HEIGHT / 2)
+	var half_width = int(WIDTH / 2)
+	for x in range(half_width):
+		draw_coords(border, Vector2i(x, half_height), GREY_TILE)
+		draw_coords(border, Vector2i(x, -half_height), GREY_TILE)
 
+		if x > 0:
+			draw_coords(border, Vector2i(-x, half_height), GREY_TILE)
+			draw_coords(border, Vector2i(-x, -half_height), GREY_TILE)
+	
+	for y in range(half_height):
+		draw_coords(border, Vector2i(half_width, y), GREY_TILE)
+		draw_coords(border, Vector2i(-half_width, y), GREY_TILE)
+		
+		if y > 0:
+			draw_coords(border, Vector2i(half_width, -y), GREY_TILE)
+			draw_coords(border, Vector2i(-half_width, -y), GREY_TILE)
+			
+	draw_coords(border, Vector2i(half_height, half_width), GREY_TILE)
+	draw_coords(border, Vector2i(half_height, -half_width), GREY_TILE)
+	draw_coords(border, Vector2i(-half_height, half_width), GREY_TILE)
+	draw_coords(border, Vector2i(-half_height, -half_width), GREY_TILE)
+			
+	
+	pass
 			
 		
 func clear_scored_pieces() -> void:
@@ -175,18 +204,28 @@ func place_piece() -> void:
 		)
 	
 	active_piece.clear()
+		
 	
 func spawn_piece() -> void:
+	var spawn_offset: Vector2i
+	if placed_tiles.get_used_cells().size() == 0:
+		spawn_offset = Vector2i(0, 0)
+	else:
+		var spawn_rect = placed_tiles.get_used_rect()
+		spawn_offset = spawn_rect.get_center() + Vector2i(spawn_rect.size / 2)
+		
 	for x in range(0, PIECE_SIZE_X):
 		for y in range(0, PIECE_SIZE_Y):
-			draw_coords(active_piece, Vector2i(x, y), roll_color())
+			draw_coords(active_piece, Vector2i(x, y) + spawn_offset, roll_color())
 			
-	draw_coords(active_piece, Vector2i(int(PIECE_SIZE_X / 2), -1), roll_color())
+	draw_coords(active_piece, Vector2i(int(PIECE_SIZE_X / 2), -1) + spawn_offset, roll_color())
 	print("spawned piece")
 		
 func can_move_in_direction(direction: Vector2i) -> bool:
 	for cell in active_piece.get_used_cells():
 		if placed_tiles.get_cell_tile_data(cell + direction):
+			return false
+		if border.get_cell_tile_data(cell + direction):
 			return false
 	
 	return true
