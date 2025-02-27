@@ -1,9 +1,8 @@
 extends Node2D
 
 const DEFAULT_LAYER = preload("res://default_layer.tscn")
-const MIN_TILES_TO_SCORE = 3
-const PIECE_SIZE_X = 3
-const PIECE_SIZE_Y = 2
+const MIN_TILES_TO_SCORE = 4
+const MAX_PIECE_SIZE = 5
 const HEIGHT = 18
 const WIDTH = 40
 const MAIN_SOURCE_ID = 0
@@ -43,23 +42,39 @@ func _ready():
 	init_border()
 	spawn_piece()
 
+
 func _input(event) -> void:
 	if event.is_action_pressed("spawn piece"):
 		place_piece()
 		clear_scored_pieces()
 		spawn_piece()
-	if event.is_action_pressed("down"):
+	elif event.is_action_pressed("down"):
 		move_piece(Vector2i(0, 1))
-	if event.is_action_pressed("up"):
+	elif event.is_action_pressed("up"):
 		move_piece(Vector2i(0, -1))
-	if event.is_action_pressed("left"):
+	elif event.is_action_pressed("left"):
 		move_piece(Vector2i(-1, 0))
-	if event.is_action_pressed("right"):
+	elif event.is_action_pressed("right"):
 		move_piece(Vector2i(1, 0))
-	if event.is_action_pressed("rotate anticlockwise"):
+	elif event.is_action_pressed("rotate anticlockwise"):
 		rotate_anticlockwise()
-	if event.is_action_pressed("rotate clockwise"):
+	elif event.is_action_pressed("rotate clockwise"):
 		rotate_clockwise()
+
+var num_steps: int = 0
+const MAX_STEPS: int = 10
+func _process(delta) -> void:
+	if (
+		Input.is_action_pressed("down") 
+		or Input.is_action_pressed("up") 
+		or Input.is_action_pressed("left") 
+		or Input.is_action_pressed("right")
+	):
+		num_steps += 1
+		if num_steps >= MAX_STEPS:
+			_input(Input)
+			num_steps = 0
+	
 
 func init_border() -> void:
 	print("init_border")
@@ -86,7 +101,6 @@ func init_border() -> void:
 	draw_coords(border, Vector2i(-half_height, half_width), GREY_TILE)
 	draw_coords(border, Vector2i(-half_height, -half_width), GREY_TILE)
 			
-	
 	pass
 			
 		
@@ -169,7 +183,7 @@ func rotate_piece(c_x: int, c_y: int) -> void:
 			c_y * relative_coord.x
 		) + anchor_point
 		
-		if placed_tiles.get_cell_tile_data(new_coord):
+		if placed_tiles.get_cell_tile_data(new_coord) or border.get_cell_tile_data(new_coord):
 			print("unable to rotate ", c_x, c_y)
 			return 
 	
@@ -205,20 +219,23 @@ func place_piece() -> void:
 	
 	active_piece.clear()
 		
-	
+
 func spawn_piece() -> void:
-	var spawn_offset: Vector2i
-	if placed_tiles.get_used_cells().size() == 0:
-		spawn_offset = Vector2i(0, 0)
-	else:
-		var spawn_rect = placed_tiles.get_used_rect()
-		spawn_offset = spawn_rect.get_center() + Vector2i(spawn_rect.size / 2)
-		
-	for x in range(0, PIECE_SIZE_X):
-		for y in range(0, PIECE_SIZE_Y):
-			draw_coords(active_piece, Vector2i(x, y) + spawn_offset, roll_color())
+	var coords: Array[Vector2i] = [Vector2i(0, 0)]
+	for n in range(MAX_PIECE_SIZE):
+		var direction = randi_range(0, 3)
+		if direction == 0:
+			coords.append(coords[-1] + Vector2i(0, 1))
+		if direction == 1:
+			coords.append(coords[-1] + Vector2i(0, -1))
+		if direction == 2:
+			coords.append(coords[-1] + Vector2i(1, 0))
+		if direction == 3:
+			coords.append(coords[-1] + Vector2i(-1, 0))
+	
+	for coord in coords:
+		draw_coords(active_piece, coord, roll_color())
 			
-	draw_coords(active_piece, Vector2i(int(PIECE_SIZE_X / 2), -1) + spawn_offset, roll_color())
 	print("spawned piece")
 		
 func can_move_in_direction(direction: Vector2i) -> bool:
