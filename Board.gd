@@ -75,7 +75,7 @@ func input_handler(event_or_input) -> void:
 	
 
 var num_steps: int = 0
-const MAX_STEPS: int = 10
+const MAX_STEPS: int = 6
 func _process(delta) -> void:
 	if (
 		Input.is_action_pressed("down") 
@@ -144,6 +144,26 @@ func clear_scored_pieces() -> void:
 			
 			if neighbors.size() >= MIN_TILES_TO_SCORE:
 				print("Scored! ", neighbors.size())
+				var color_str: String = "#FFF"
+				if color_to_check == BLUE_TILE:
+					color_str = "#24D"
+				elif color_to_check == GREEN_TILE:
+					color_str = "#0F0"
+				elif color_to_check == RED_TILE:
+					color_str = "#F00"
+				elif color_to_check == ORANGE_TILE:
+					color_str = "#F99"
+				elif color_to_check == LIGHT_BLUE_TILE:
+					color_str = "#5AF"
+				elif color_to_check == YELLOW_TILE:
+					color_str = "#FF0"
+					
+				var score_coords = placed_tiles.map_to_local(neighbors[0])
+				ScoreNumbers.display_number(
+					neighbors.size(), 
+					placed_tiles.to_global(score_coords) + Vector2(0, -80), 
+					color_str,
+				)
 				scored_tiles.append_array(neighbors)
 				
 				
