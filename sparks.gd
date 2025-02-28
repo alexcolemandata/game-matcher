@@ -1,5 +1,6 @@
 extends Node2D
 
-func fire(coord: Vector2) -> void:
+func fire(coord: Vector2, mod: Color = Color(1, 1, 1, 1)) -> void:
 	global_position = coord
-	$Rocket.emitting = true
+	modulate = mod
+	$Blast.emitting = true

@@ -21,7 +21,7 @@ offset_bottom = -277.0
 theme_override_font_sizes/font_size = 100
 text = "START GAME"
 
-[node name="Button" type="Button" parent="."]
+[node name="GravityDownButton" type="Button" parent="."]
 offset_left = -57.0
 offset_top = 358.0
 offset_right = 57.0
@@ -29,9 +29,18 @@ offset_bottom = 389.0
 toggle_mode = true
 text = "Gravity Down"
 
+[node name="RandomlyPopulateButton" type="Button" parent="."]
+offset_left = 204.0
+offset_top = 356.0
+offset_right = 363.0
+offset_bottom = 387.0
+toggle_mode = true
+text = "Randomly Populate"
+
 [node name="Timer" type="Timer" parent="."]
 unique_name_in_owner = true
 wait_time = 0.2
 autostart = true
 
-[connection signal="pressed" from="Button" to="LayerHolder" method="_on_button_pressed"]
+[connection signal="pressed" from="GravityDownButton" to="LayerHolder" method="_on_button_pressed"]
+[connection signal="pressed" from="RandomlyPopulateButton" to="LayerHolder" method="_on_randomly_populate_button_pressed"]

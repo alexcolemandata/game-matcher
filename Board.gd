@@ -25,7 +25,6 @@ const TILES = [
 	ORANGE_TILE, 
 	BLUE_TILE, 
 ]
-var sparks
 
 var border: TileMapLayer
 var placed_tiles: TileMapLayer
@@ -39,11 +38,9 @@ func _ready():
 	active_piece = DEFAULT_LAYER.instantiate()
 	active_piece.modulate = Color(1, 1, 1, 0.3)
 	border = DEFAULT_LAYER.instantiate()
-	sparks = SPARKS.instantiate()
 	add_child(border)
 	add_child(placed_tiles)
 	add_child(active_piece)
-	add_child(sparks)
 	
 	init_border()
 	spawn_piece()
@@ -165,8 +162,9 @@ func clear_scored_pieces() -> bool:
 				var score_coords = placed_tiles.map_to_local(neighbors[0])
 				for scored_tile in neighbors:
 					await get_tree().create_timer(0.05).timeout
-					
-					sparks.fire(placed_tiles.to_global(placed_tiles.map_to_local(scored_tile)))
+					var sparks = SPARKS.instantiate()
+					add_child(sparks)
+					sparks.fire(placed_tiles.to_global(placed_tiles.map_to_local(scored_tile)), color_str)
 					placed_tiles.erase_cell(scored_tile)
 					
 				
@@ -341,7 +339,9 @@ func gravity_down() -> void:
 		else:
 			per_x_coords[x].append(coord)
 	
-	for x in per_x_coords.keys():
+	var ordered_cols = per_x_coords.keys()
+	ordered_cols.sort()
+	for x in ordered_cols:
 		var col_coords = per_x_coords[x]
 		col_coords.sort_custom(sort_vectors_lowest_to_highest)
 		
@@ -360,7 +360,7 @@ func gravity_down() -> void:
 			var new_coord = Vector2i(x, int(HEIGHT/2)-i-1)
 			print("gravity from: ", old_coord, "; to: ", new_coord)
 			for j in range(old_coord.y, new_coord.y ):
-				await get_tree().create_timer(0.01).timeout
+				await get_tree().create_timer(0.001).timeout
 				placed_tiles.erase_cell(Vector2i(x, j))
 				draw_coords(placed_tiles, Vector2i(x, j+1), color)
 	
@@ -378,3 +378,15 @@ func gravity_down() -> void:
 
 func sort_vectors_lowest_to_highest(a: Vector2i, b: Vector2i) -> bool:
 	return a.y > b.y
+
+
+func _on_randomly_populate_button_pressed() -> void:
+	randomly_populate_grid()
+	
+func randomly_populate_grid() -> void:
+	print("randomly populating grid")
+	var half_height = int(HEIGHT / 2)
+	var half_width = int(WIDTH / 2)
+	for x in range(-half_width + 1, half_width):
+		for y in range(-half_height + 1, half_height):
+			draw_coords(placed_tiles, Vector2i(x, y), roll_color())
