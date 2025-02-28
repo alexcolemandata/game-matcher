@@ -7,8 +7,7 @@ func display_number(value: int, position: Vector2, color: String):
 	number.z_index = 5
 	number.label_settings = LabelSettings.new()
 	
-	number.label_settings.font_size = 10 + value * 20
-
+	number.label_settings.font_size = value * 15
 		
 	number.label_settings.font_color = color
 	number.label_settings.outline_color = "#000"

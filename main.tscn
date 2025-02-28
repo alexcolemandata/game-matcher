@@ -20,3 +20,18 @@ offset_right = 304.0
 offset_bottom = -277.0
 theme_override_font_sizes/font_size = 100
 text = "START GAME"
+
+[node name="Button" type="Button" parent="."]
+offset_left = -57.0
+offset_top = 358.0
+offset_right = 57.0
+offset_bottom = 389.0
+toggle_mode = true
+text = "Gravity Down"
+
+[node name="Timer" type="Timer" parent="."]
+unique_name_in_owner = true
+wait_time = 0.2
+autostart = true
+
+[connection signal="pressed" from="Button" to="LayerHolder" method="_on_button_pressed"]

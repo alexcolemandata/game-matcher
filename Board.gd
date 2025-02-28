@@ -4,11 +4,11 @@ const DEFAULT_LAYER = preload("res://default_layer.tscn")
 const MIN_TILES_TO_SCORE = 3
 const MAX_PIECE_SIZE = 12
 const HEIGHT = 18
-const WIDTH = 40
+const WIDTH = 28
 const MAIN_SOURCE_ID = 0
 
-const PLACABLE_ALPHA = 0.6
-const UNPLACABLE_ALPHA = 0.1
+const PLACABLE_MODULATION = Color(1, 1, 1, 0.6)
+const UNPLACABLE_MODULATION = Color(1, 1, 1, 0.1)
 
 const LIGHT_BLUE_TILE = Vector2i(0, 0)
 const PURPLE_TILE = Vector2i(1, 0)
@@ -75,7 +75,7 @@ func input_handler(event_or_input) -> void:
 	
 
 var num_steps: int = 0
-const MAX_STEPS: int = 6
+const MAX_STEPS: int = 8
 func _process(delta) -> void:
 	if (
 		Input.is_action_pressed("down") 
@@ -256,7 +256,7 @@ func place_piece() -> void:
 
 func spawn_piece() -> void:
 	var coords: Array[Vector2i] = [Vector2i(0, 0)]
-	for n in range(MAX_PIECE_SIZE):
+	for n in range(randi_range(1, MAX_PIECE_SIZE)):
 		var direction = randi_range(0, 3)
 		if direction == 0:
 			coords.append(coords[-1] + Vector2i(0, 1))
@@ -275,9 +275,9 @@ func spawn_piece() -> void:
 	
 func set_piece_alpha():
 	if is_piece_placable():
-		active_piece.modulate = Color(1, 1, 1, PLACABLE_ALPHA)
+		active_piece.modulate = PLACABLE_MODULATION
 	else:
-		active_piece.modulate = Color(1, 1, 1, UNPLACABLE_ALPHA)
+		active_piece.modulate = UNPLACABLE_MODULATION
 		
 func can_move_in_direction(direction: Vector2i) -> bool:
 	for cell in active_piece.get_used_cells():
@@ -314,3 +314,49 @@ func pick_color(roll: int) -> Vector2i:
 	
 func draw_coords(layer: TileMapLayer, coords: Vector2i, color: Vector2i):
 	layer.set_cell(coords, MAIN_SOURCE_ID, color)
+
+
+func _on_button_pressed() -> void:
+	print("_on_button_pressed")
+	gravity_down()
+	
+	
+func gravity_down() -> void:
+	print("gravity down")
+	
+	var placed_coords = placed_tiles.get_used_cells()
+	var per_x_coords: Dictionary = {}
+	for coord in placed_coords:
+		var x = coord.x
+		if x not in per_x_coords.keys():
+			per_x_coords[x] = [coord]
+		else:
+			per_x_coords[x].append(coord)
+	
+	for x in per_x_coords.keys():
+		var col_coords = per_x_coords[x]
+		col_coords.sort_custom(sort_vectors_lowest_to_highest)
+		
+		var min_y
+		for coord in col_coords:
+			if (min_y == null) or coord.y < min_y:
+				min_y = coord.y
+			
+		if (int(HEIGHT / 2) - col_coords.size()) == min_y:
+			continue
+		
+		for i in range(col_coords.size()):
+			var old_coord = col_coords[i]
+			
+			var color = placed_tiles.get_cell_atlas_coords(old_coord)
+			var new_coord = Vector2i(x, int(HEIGHT/2)-i-1)
+			print("gravity to ", old_coord)
+			await get_tree().create_timer(0.03).timeout
+			placed_tiles.erase_cell(old_coord)
+			draw_coords(placed_tiles, new_coord, color)
+			
+	clear_scored_pieces()
+	pass
+
+func sort_vectors_lowest_to_highest(a: Vector2i, b: Vector2i) -> bool:
+	return a.y > b.y
