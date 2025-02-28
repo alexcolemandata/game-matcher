@@ -1,8 +1,8 @@
 extends Node2D
-
+const SPARKS = preload("res://sparks.tscn")
 const DEFAULT_LAYER = preload("res://default_layer.tscn")
-const MIN_TILES_TO_SCORE = 4
-const MAX_PIECE_SIZE = 8
+const MIN_TILES_TO_SCORE = 3
+const MAX_PIECE_SIZE = 12
 const HEIGHT = 18
 const WIDTH = 28
 const MAIN_SOURCE_ID = 0
@@ -25,6 +25,7 @@ const TILES = [
 	ORANGE_TILE, 
 	BLUE_TILE, 
 ]
+var sparks
 
 var border: TileMapLayer
 var placed_tiles: TileMapLayer
@@ -33,13 +34,16 @@ var score = 0
 
 
 func _ready():
+	
 	placed_tiles = DEFAULT_LAYER.instantiate()
 	active_piece = DEFAULT_LAYER.instantiate()
 	active_piece.modulate = Color(1, 1, 1, 0.3)
 	border = DEFAULT_LAYER.instantiate()
+	sparks = SPARKS.instantiate()
 	add_child(border)
 	add_child(placed_tiles)
 	add_child(active_piece)
+	add_child(sparks)
 	
 	init_border()
 	spawn_piece()
@@ -161,7 +165,11 @@ func clear_scored_pieces() -> bool:
 				var score_coords = placed_tiles.map_to_local(neighbors[0])
 				for scored_tile in neighbors:
 					await get_tree().create_timer(0.05).timeout
+					
+					sparks.fire(placed_tiles.to_global(placed_tiles.map_to_local(scored_tile)))
 					placed_tiles.erase_cell(scored_tile)
+					
+				
 	
 				ScoreNumbers.display_number(
 					neighbors.size(), 

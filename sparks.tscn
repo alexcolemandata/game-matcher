@@ -1,0 +1,107 @@
+[gd_scene load_steps=18 format=3 uid="uid://bvkj5ngh07est"]
+
+[ext_resource type="Script" path="res://sparks.gd" id="1_jqpg3"]
+[ext_resource type="Script" path="res://rocket.gd" id="1_kmerv"]
+[ext_resource type="Script" path="res://blast.gd" id="1_odf1s"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_w3x4k"]
+blend_mode = 1
+
+[sub_resource type="Curve" id="Curve_b3rv8"]
+_data = [Vector2(0, 0), 0.0, 2.83928, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_w123b"]
+curve = SubResource("Curve_b3rv8")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_poxsy"]
+lifetime_randomness = 0.2
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(4, 1, 1)
+direction = Vector3(0, -1, 0)
+spread = 0.0
+initial_velocity_min = 50.0
+initial_velocity_max = 100.0
+gravity = Vector3(0, 0, 0)
+alpha_curve = SubResource("CurveTexture_w123b")
+sub_emitter_mode = 2
+sub_emitter_amount_at_end = 32
+
+[sub_resource type="Gradient" id="Gradient_v0pqo"]
+colors = PackedColorArray(0.855115, 0.53865, 0.196405, 1, 0.752724, 0.196147, 0.296532, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_xe74i"]
+gradient = SubResource("Gradient_v0pqo")
+width = 1
+fill_to = Vector2(1, 1)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_qv6q1"]
+blend_mode = 1
+
+[sub_resource type="Curve" id="Curve_38j01"]
+_data = [Vector2(0, 1), 0.0, 0.0538278, 0, 0, Vector2(0.990566, 0), -0.0220832, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_se5an"]
+curve = SubResource("Curve_38j01")
+
+[sub_resource type="Gradient" id="Gradient_pym0v"]
+offsets = PackedFloat32Array(0, 0.251724, 0.52069, 0.772414, 1)
+colors = PackedColorArray(0.880831, 0.0962865, 0.207814, 0.478431, 0.685128, 0.234726, 0.00603454, 0.764706, 0.32477, 0.444119, 0.937919, 0.784314, 0.772522, 0.769131, 1.92523e-06, 0.909804, 0, 0.739827, 0.689904, 0.741176)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_yqtj5"]
+gradient = SubResource("Gradient_pym0v")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_3fgw6"]
+lifetime_randomness = 1.0
+particle_flag_disable_z = true
+direction = Vector3(1, 1, 0)
+spread = 180.0
+initial_velocity_min = 50.0
+initial_velocity_max = 150.0
+gravity = Vector3(0, 98, 0)
+damping_max = 100.0
+scale_min = 0.5
+color_initial_ramp = SubResource("GradientTexture1D_yqtj5")
+alpha_curve = SubResource("CurveTexture_se5an")
+
+[sub_resource type="Gradient" id="Gradient_61g54"]
+colors = PackedColorArray(0.610014, 6.63242e-05, 0.509594, 1, 0.878736, 0.661828, 0.0505028, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_l5ppk"]
+gradient = SubResource("Gradient_61g54")
+width = 1
+fill_to = Vector2(0, 1)
+
+[node name="Sparks" type="Node2D"]
+position = Vector2(757, 384)
+script = ExtResource("1_jqpg3")
+
+[node name="Rocket" type="GPUParticles2D" parent="."]
+material = SubResource("CanvasItemMaterial_w3x4k")
+position = Vector2(-1, 0)
+emitting = false
+amount = 4
+sub_emitter = NodePath("../Blast")
+process_material = SubResource("ParticleProcessMaterial_poxsy")
+texture = SubResource("GradientTexture2D_xe74i")
+lifetime = 0.5
+one_shot = true
+local_coords = true
+trail_enabled = true
+trail_lifetime = 0.4
+script = ExtResource("1_kmerv")
+
+[node name="Blast" type="GPUParticles2D" parent="."]
+material = SubResource("CanvasItemMaterial_qv6q1")
+position = Vector2(1, -30)
+emitting = false
+amount = 1000
+process_material = SubResource("ParticleProcessMaterial_3fgw6")
+texture = SubResource("GradientTexture2D_l5ppk")
+lifetime = 0.8
+local_coords = true
+trail_enabled = true
+trail_lifetime = 0.08
+script = ExtResource("1_odf1s")
