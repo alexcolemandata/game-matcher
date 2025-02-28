@@ -1,8 +1,8 @@
 extends Node2D
 
 const DEFAULT_LAYER = preload("res://default_layer.tscn")
-const MIN_TILES_TO_SCORE = 3
-const MAX_PIECE_SIZE = 12
+const MIN_TILES_TO_SCORE = 4
+const MAX_PIECE_SIZE = 8
 const HEIGHT = 18
 const WIDTH = 28
 const MAIN_SOURCE_ID = 0
@@ -109,15 +109,15 @@ func init_border() -> void:
 			draw_coords(border, Vector2i(half_width, -y), GREY_TILE)
 			draw_coords(border, Vector2i(-half_width, -y), GREY_TILE)
 			
-	draw_coords(border, Vector2i(half_height, half_width), GREY_TILE)
-	draw_coords(border, Vector2i(half_height, -half_width), GREY_TILE)
-	draw_coords(border, Vector2i(-half_height, half_width), GREY_TILE)
-	draw_coords(border, Vector2i(-half_height, -half_width), GREY_TILE)
+	draw_coords(border, Vector2i(half_width, half_height), GREY_TILE)
+	draw_coords(border, Vector2i(half_width, -half_height), GREY_TILE)
+	draw_coords(border, Vector2i(-half_width, half_height), GREY_TILE)
+	draw_coords(border, Vector2i(-half_width, -half_height), GREY_TILE)
 			
 	pass
 			
 		
-func clear_scored_pieces() -> void:
+func clear_scored_pieces() -> bool:
 	print("clear_scored_pieces")
 	var scored_tiles: Array[Vector2i] = []
 	for color_to_check in TILES:
@@ -152,13 +152,17 @@ func clear_scored_pieces() -> void:
 				elif color_to_check == RED_TILE:
 					color_str = "#F00"
 				elif color_to_check == ORANGE_TILE:
-					color_str = "#F99"
+					color_str = "#FF7F00"
 				elif color_to_check == LIGHT_BLUE_TILE:
 					color_str = "#5AF"
 				elif color_to_check == YELLOW_TILE:
 					color_str = "#FF0"
 					
 				var score_coords = placed_tiles.map_to_local(neighbors[0])
+				for scored_tile in neighbors:
+					await get_tree().create_timer(0.05).timeout
+					placed_tiles.erase_cell(scored_tile)
+	
 				ScoreNumbers.display_number(
 					neighbors.size(), 
 					placed_tiles.to_global(score_coords) + Vector2(0, -80), 
@@ -166,16 +170,12 @@ func clear_scored_pieces() -> void:
 				)
 				scored_tiles.append_array(neighbors)
 				
-				
 			continue
 							
 	print("Total scored: ", scored_tiles.size())
 	score += scored_tiles.size()
 	%Score.text = str(score)
-	for scored_tile in scored_tiles:
-		placed_tiles.erase_cell(scored_tile)
-	
-	return
+	return scored_tiles.size() > 0
 
 
 func get_tile_flood_fill(coord: Vector2i, tiles: Array[Vector2i], flooded: Array[Vector2i] = []) -> Array[Vector2i]:
@@ -350,12 +350,22 @@ func gravity_down() -> void:
 			
 			var color = placed_tiles.get_cell_atlas_coords(old_coord)
 			var new_coord = Vector2i(x, int(HEIGHT/2)-i-1)
-			print("gravity to ", old_coord)
-			await get_tree().create_timer(0.03).timeout
-			placed_tiles.erase_cell(old_coord)
-			draw_coords(placed_tiles, new_coord, color)
-			
-	clear_scored_pieces()
+			print("gravity from: ", old_coord, "; to: ", new_coord)
+			for j in range(old_coord.y, new_coord.y ):
+				await get_tree().create_timer(0.01).timeout
+				placed_tiles.erase_cell(Vector2i(x, j))
+				draw_coords(placed_tiles, Vector2i(x, j+1), color)
+	
+	if await clear_scored_pieces():
+		print("scored pieces after applying gravity! repeating")
+		ScoreNumbers.display_str(
+					"Again!", 
+					Vector2(0, 0), 
+					"#FFF",
+					80
+				)
+		await get_tree().create_timer(0.2).timeout
+		gravity_down()
 	pass
 
 func sort_vectors_lowest_to_highest(a: Vector2i, b: Vector2i) -> bool:
