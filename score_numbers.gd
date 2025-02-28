@@ -25,11 +25,11 @@ func display_str(str, position: Vector2, color: String, font_size: int):
 	
 	tween.tween_property(
 		lbl, "position:y", lbl.position.y, 0.5
-	).set_ease(Tween.EASE_IN).set_delay(0.25)
+	).set_ease(Tween.EASE_IN).set_delay(0.22 + (font_size/120))
 	
 	tween.tween_property(
 		lbl, "scale", Vector2.ZERO, 0.25
-	).set_ease(Tween.EASE_IN).set_delay(0.5)
+	).set_ease(Tween.EASE_IN).set_delay(0.4 + (font_size/120))
 		
 	await tween.finished
 	lbl.queue_free()

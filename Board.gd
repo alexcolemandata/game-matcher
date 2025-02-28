@@ -24,12 +24,15 @@ const TILES = [
 	GREEN_TILE, 
 	ORANGE_TILE, 
 	BLUE_TILE, 
+	RED_TILE,
+	PURPLE_TILE
 ]
 
 var border: TileMapLayer
 var placed_tiles: TileMapLayer
 var active_piece: TileMapLayer
 var score = 0
+var num_gravity_repeats = 0
 
 
 func _ready():
@@ -158,6 +161,8 @@ func clear_scored_pieces() -> bool:
 					color_str = "#5AF"
 				elif color_to_check == YELLOW_TILE:
 					color_str = "#FF0"
+				elif color_to_check == PURPLE_TILE:
+					color_str = "#9A00CD"
 					
 				var score_coords = placed_tiles.map_to_local(neighbors[0])
 				for scored_tile in neighbors:
@@ -358,7 +363,6 @@ func gravity_down() -> void:
 			
 			var color = placed_tiles.get_cell_atlas_coords(old_coord)
 			var new_coord = Vector2i(x, int(HEIGHT/2)-i-1)
-			print("gravity from: ", old_coord, "; to: ", new_coord)
 			for j in range(old_coord.y, new_coord.y ):
 				await get_tree().create_timer(0.001).timeout
 				placed_tiles.erase_cell(Vector2i(x, j))
@@ -366,14 +370,24 @@ func gravity_down() -> void:
 	
 	if await clear_scored_pieces():
 		print("scored pieces after applying gravity! repeating")
+		await get_tree().create_timer(0.2).timeout
+		num_gravity_repeats += 1
+		var msg: = "Again"
+		if num_gravity_repeats > 1:
+			for n in range(num_gravity_repeats):
+				msg += "!"
+			msg += " x" + str(num_gravity_repeats)
+			
 		ScoreNumbers.display_str(
-					"Again!", 
-					Vector2(0, 0), 
+					msg, 
+					Vector2(randi_range(-400, -100), randi_range(-100, 100)),
 					"#FFF",
-					80
+					70 + (15 * num_gravity_repeats)
 				)
 		await get_tree().create_timer(0.2).timeout
 		gravity_down()
+	else:
+		num_gravity_repeats = 0
 	pass
 
 func sort_vectors_lowest_to_highest(a: Vector2i, b: Vector2i) -> bool:
