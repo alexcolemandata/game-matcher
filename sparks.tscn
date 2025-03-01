@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://bvkj5ngh07est"]
+[gd_scene load_steps=9 format=3 uid="uid://bvkj5ngh07est"]
 
 [ext_resource type="Script" path="res://sparks.gd" id="1_jqpg3"]
 [ext_resource type="Script" path="res://blast.gd" id="1_odf1s"]
@@ -19,6 +19,7 @@ colors = PackedColorArray(0.88, 0.88, 0.88, 0.776471, 0.685128, 0.234726, 0.0060
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_yqtj5"]
 gradient = SubResource("Gradient_pym0v")
+use_hdr = true
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_3fgw6"]
 lifetime_randomness = 0.4
@@ -28,7 +29,7 @@ spread = 180.0
 initial_velocity_min = 78.25
 initial_velocity_max = 195.19
 orbit_velocity_min = 9.49949e-08
-orbit_velocity_max = 9.49949e-08
+orbit_velocity_max = 0.147
 radial_velocity_min = -2.23517e-05
 radial_velocity_max = -2.23517e-05
 gravity = Vector3(0, 98, 0)
@@ -37,14 +38,6 @@ scale_min = 0.5
 color_initial_ramp = SubResource("GradientTexture1D_yqtj5")
 alpha_curve = SubResource("CurveTexture_se5an")
 turbulence_noise_speed = Vector3(0.5, 0.2, 0.2)
-
-[sub_resource type="Gradient" id="Gradient_61g54"]
-colors = PackedColorArray(1, 1, 1, 0.905882, 0.3, 0.3, 0.3, 0.898039)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_l5ppk"]
-gradient = SubResource("Gradient_61g54")
-width = 3
-fill_to = Vector2(0, 1)
 
 [node name="Sparks" type="Node2D"]
 position = Vector2(757, 384)
@@ -55,7 +48,6 @@ material = SubResource("CanvasItemMaterial_qv6q1")
 emitting = false
 amount = 100
 process_material = SubResource("ParticleProcessMaterial_3fgw6")
-texture = SubResource("GradientTexture2D_l5ppk")
 lifetime = 1.4
 one_shot = true
 explosiveness = 1.0

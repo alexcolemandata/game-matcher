@@ -1,9 +1,9 @@
 extends Node
 
-func display_str(str, position: Vector2, color: String, font_size: int):
+func display_str(s, position: Vector2, color, font_size: int):
 	var lbl = Label.new()
 	lbl.global_position = position
-	lbl.text = str(str)
+	lbl.text = str(s)
 	lbl.z_index = 5
 	lbl.label_settings = LabelSettings.new()
 	
@@ -36,7 +36,7 @@ func display_str(str, position: Vector2, color: String, font_size: int):
 	return
 	
 
-func display_number(value: int, position: Vector2, color: String):
+func display_number(value: int, position: Vector2, color):
 	display_str("+"+str(value), position, color, value * 10)
 	
 	
