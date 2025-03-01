@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://gqk581qj7hub"]
+[gd_scene load_steps=4 format=3 uid="uid://gqk581qj7hub"]
 
 [ext_resource type="Script" path="res://Board.gd" id="1_fd0w8"]
 [ext_resource type="AudioStream" uid="uid://ccelco8puwjvb" path="res://assets/Puzzle-Game-5_Looping.mp3" id="2_ydyxf"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wpfd3"]
+bg_color = Color(0, 0, 0, 0.368627)
 
 [node name="Main" type="Node2D"]
 
@@ -13,30 +16,22 @@ unique_name_in_owner = true
 zoom = Vector2(1.015, 1.015)
 position_smoothing_enabled = true
 
-[node name="Score" type="Label" parent="."]
-unique_name_in_owner = true
-offset_left = -307.0
-offset_top = -414.0
-offset_right = 304.0
-offset_bottom = -277.0
-theme_override_font_sizes/font_size = 100
-text = "START GAME"
-
 [node name="GravityDownButton" type="Button" parent="."]
-offset_left = -57.0
-offset_top = 358.0
-offset_right = 57.0
+unique_name_in_owner = true
+offset_left = -165.0
+offset_top = 331.0
+offset_right = 165.0
 offset_bottom = 389.0
-toggle_mode = true
-text = "Gravity Down"
+theme_override_font_sizes/font_size = 36
+text = "Score"
 
 [node name="RandomlyPopulateButton" type="Button" parent="."]
-offset_left = 204.0
+offset_left = 486.0
 offset_top = 356.0
-offset_right = 363.0
+offset_right = 685.0
 offset_bottom = 387.0
 toggle_mode = true
-text = "Randomly Populate"
+text = "DEV: Randomly Populate"
 
 [node name="Timer" type="Timer" parent="."]
 unique_name_in_owner = true
@@ -48,6 +43,37 @@ stream = ExtResource("2_ydyxf")
 volume_db = -10.602
 autoplay = true
 parameters/looping = true
+
+[node name="GameOver" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -688.0
+offset_top = -390.0
+offset_right = 688.0
+offset_bottom = 390.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 100
+theme_override_styles/normal = SubResource("StyleBoxFlat_wpfd3")
+text = "Good Job!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Score" type="Label" parent="."]
+unique_name_in_owner = true
+offset_left = -307.0
+offset_top = -414.0
+offset_right = 304.0
+offset_bottom = -277.0
+theme_override_font_sizes/font_size = 100
+text = "START GAME"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [connection signal="pressed" from="GravityDownButton" to="LayerHolder" method="_on_button_pressed"]
 [connection signal="pressed" from="RandomlyPopulateButton" to="LayerHolder" method="_on_randomly_populate_button_pressed"]

@@ -3,8 +3,8 @@ const SPARKS = preload("res://sparks.tscn")
 const DEFAULT_LAYER = preload("res://default_layer.tscn")
 const MIN_TILES_TO_SCORE = 3
 const MAX_PIECE_SIZE = 12
-const HEIGHT = 18
-const WIDTH = 38
+const HEIGHT = 16
+const WIDTH = 24
 const MAIN_SOURCE_ID = 0
 
 const PLACABLE_MODULATION = Color(1, 1, 1, 0.6)
@@ -23,8 +23,8 @@ const TILES = [
 	YELLOW_TILE, 
 	GREEN_TILE, 
 	ORANGE_TILE, 
-	#BLUE_TILE, 
-	#RED_TILE,
+	BLUE_TILE, 
+	RED_TILE,
 	PURPLE_TILE
 ]
 
@@ -59,7 +59,7 @@ func _input(event) -> void:
 	if event.is_action_pressed("spawn piece"):
 		if is_piece_placable():
 			place_piece()
-			clear_scored_pieces()
+			# clear_scored_pieces()
 			spawn_piece()
 	elif event.is_action_pressed("rotate anticlockwise"):
 		rotate_anticlockwise()
@@ -346,7 +346,11 @@ func _on_button_pressed() -> void:
 	AudioManager.create_2d_audio_at_location(
 		Vector2(0,0),
 		SoundEffect.SOUND_EFFECT_TYPE.GRAVITY)
+	%GravityDownButton.queue_free()
+	active_piece.clear()
+	clear_scored_pieces()
 	gravity_down()
+	
 	
 	
 func gravity_down() -> void:
@@ -408,6 +412,7 @@ func gravity_down() -> void:
 		gravity_down()
 	else:
 		num_gravity_repeats = 0
+		%GameOver.visible = true
 	pass
 
 func sort_vectors_lowest_to_highest(a: Vector2i, b: Vector2i) -> bool:
