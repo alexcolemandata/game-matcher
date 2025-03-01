@@ -1,0 +1,70 @@
+[gd_scene load_steps=15 format=3 uid="uid://chl5xop54uyqr"]
+
+[ext_resource type="Script" path="res://audio_manager.gd" id="1_6mwdm"]
+[ext_resource type="Script" path="res://SoundEffectSetting.gd" id="2_yy1v5"]
+[ext_resource type="AudioStream" uid="uid://c4cakhjdne0qs" path="res://assets/pop3.ogg" id="3_6f6b3"]
+[ext_resource type="AudioStream" uid="uid://yf1s4l3boemg" path="res://assets/pop2.ogg" id="3_hsk3x"]
+[ext_resource type="AudioStream" uid="uid://ci1keh552f0gv" path="res://assets/pop1.ogg" id="5_wioqe"]
+[ext_resource type="AudioStream" uid="uid://d0oethogqlv7r" path="res://assets/levelcompletesplash.mp3" id="6_avn6v"]
+[ext_resource type="AudioStream" uid="uid://c363k0rvbn15t" path="res://assets/gravity.mp3" id="7_mlfgn"]
+[ext_resource type="AudioStream" uid="uid://b8i53yb3ko7u0" path="res://assets/sound_click.wav" id="8_alsrr"]
+
+[sub_resource type="Resource" id="Resource_lpuss"]
+resource_local_to_scene = true
+script = ExtResource("2_yy1v5")
+limit = 10
+type = 0
+sound_effect = ExtResource("3_6f6b3")
+volume = 0.0
+pitch_scale = 1.0
+pitch_randomness = 0.2
+
+[sub_resource type="Resource" id="Resource_u5c77"]
+resource_local_to_scene = true
+script = ExtResource("2_yy1v5")
+limit = 10
+type = 1
+sound_effect = ExtResource("3_hsk3x")
+volume = 0.0
+pitch_scale = 1.0
+pitch_randomness = 0.2
+
+[sub_resource type="Resource" id="Resource_h6tae"]
+script = ExtResource("2_yy1v5")
+limit = 10
+type = 2
+sound_effect = ExtResource("5_wioqe")
+volume = 0.0
+pitch_scale = 1.0
+pitch_randomness = 0.2
+
+[sub_resource type="Resource" id="Resource_bqsbl"]
+script = ExtResource("2_yy1v5")
+limit = 5
+type = 3
+sound_effect = ExtResource("6_avn6v")
+volume = 0.0
+pitch_scale = 1.0
+pitch_randomness = 0.0
+
+[sub_resource type="Resource" id="Resource_632ac"]
+script = ExtResource("2_yy1v5")
+limit = 5
+type = 4
+sound_effect = ExtResource("7_mlfgn")
+volume = 0.0
+pitch_scale = 1.0
+pitch_randomness = 0.0
+
+[sub_resource type="Resource" id="Resource_n2nje"]
+script = ExtResource("2_yy1v5")
+limit = 5
+type = 5
+sound_effect = ExtResource("8_alsrr")
+volume = 0.0
+pitch_scale = 1.0
+pitch_randomness = 0.33
+
+[node name="AudioManager" type="Node2D"]
+script = ExtResource("1_6mwdm")
+sound_effects = Array[ExtResource("2_yy1v5")]([SubResource("Resource_lpuss"), SubResource("Resource_u5c77"), SubResource("Resource_h6tae"), SubResource("Resource_bqsbl"), SubResource("Resource_632ac"), SubResource("Resource_n2nje")])

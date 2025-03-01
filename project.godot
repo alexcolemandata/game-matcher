@@ -18,6 +18,8 @@ config/icon="res://icon.svg"
 [autoload]
 
 ScoreNumbers="*res://score_numbers.gd"
+AudioManager="*res://AudioManager.tscn"
+SoundEffectSetting="*res://SoundEffectSetting.gd"
 
 [display]
 

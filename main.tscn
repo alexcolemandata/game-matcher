@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://gqk581qj7hub"]
+[gd_scene load_steps=3 format=3 uid="uid://gqk581qj7hub"]
 
 [ext_resource type="Script" path="res://Board.gd" id="1_fd0w8"]
+[ext_resource type="AudioStream" uid="uid://ccelco8puwjvb" path="res://assets/Puzzle-Game-5_Looping.mp3" id="2_ydyxf"]
 
 [node name="Main" type="Node2D"]
 
@@ -41,6 +42,12 @@ text = "Randomly Populate"
 unique_name_in_owner = true
 wait_time = 0.2
 autostart = true
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_ydyxf")
+volume_db = -10.602
+autoplay = true
+parameters/looping = true
 
 [connection signal="pressed" from="GravityDownButton" to="LayerHolder" method="_on_button_pressed"]
 [connection signal="pressed" from="RandomlyPopulateButton" to="LayerHolder" method="_on_randomly_populate_button_pressed"]

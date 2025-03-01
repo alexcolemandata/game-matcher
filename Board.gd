@@ -4,7 +4,7 @@ const DEFAULT_LAYER = preload("res://default_layer.tscn")
 const MIN_TILES_TO_SCORE = 3
 const MAX_PIECE_SIZE = 12
 const HEIGHT = 18
-const WIDTH = 28
+const WIDTH = 38
 const MAIN_SOURCE_ID = 0
 
 const PLACABLE_MODULATION = Color(1, 1, 1, 0.6)
@@ -23,8 +23,8 @@ const TILES = [
 	YELLOW_TILE, 
 	GREEN_TILE, 
 	ORANGE_TILE, 
-	BLUE_TILE, 
-	RED_TILE,
+	#BLUE_TILE, 
+	#RED_TILE,
 	PURPLE_TILE
 ]
 
@@ -33,6 +33,12 @@ var placed_tiles: TileMapLayer
 var active_piece: TileMapLayer
 var score = 0
 var num_gravity_repeats = 0
+
+const TILE_CLEAR_SOUNDS = [
+	SoundEffect.SOUND_EFFECT_TYPE.ON_TILE_CLEAR_1,
+	SoundEffect.SOUND_EFFECT_TYPE.ON_TILE_CLEAR_2,
+	SoundEffect.SOUND_EFFECT_TYPE.ON_TILE_CLEAR_3,
+]
 
 
 func _ready():
@@ -169,23 +175,28 @@ func clear_scored_pieces() -> bool:
 					await get_tree().create_timer(0.05).timeout
 					var sparks = SPARKS.instantiate()
 					add_child(sparks)
-					sparks.fire(placed_tiles.to_global(placed_tiles.map_to_local(scored_tile)), color_str)
+					var global_coord = placed_tiles.to_global(placed_tiles.map_to_local(scored_tile))
+					var sound_effect = TILE_CLEAR_SOUNDS[randi_range(0, TILE_CLEAR_SOUNDS.size()-1)]
+					AudioManager.sound_effect_dict[sound_effect].pitch_scale = 0.4 + (score / 300.0)
+					AudioManager.create_2d_audio_at_location(
+						global_coord, 
+						sound_effect)
+					sparks.fire(global_coord, color_str)
 					placed_tiles.erase_cell(scored_tile)
 					
-				
-	
 				ScoreNumbers.display_number(
 					neighbors.size(), 
 					placed_tiles.to_global(score_coords) + Vector2(0, -80), 
 					color_str,
-				)
+				) 
 				scored_tiles.append_array(neighbors)
+				score += neighbors.size()
+				%Score.text = str(score)
 				
 			continue
 							
 	print("Total scored: ", scored_tiles.size())
-	score += scored_tiles.size()
-	%Score.text = str(score)
+	
 	return scored_tiles.size() > 0
 
 
@@ -254,6 +265,9 @@ func get_piece_coords() -> Array[Vector2i]:
 func place_piece() -> void:
 	var piece_cells = get_piece_coords()
 	var piece_colors = get_layer_colors(active_piece)
+	AudioManager.create_2d_audio_at_location(
+		Vector2(0,0),
+		SoundEffect.SOUND_EFFECT_TYPE.ON_PLACE)
 	
 	for i in range(piece_cells.size()):
 		draw_coords(
@@ -329,12 +343,14 @@ func draw_coords(layer: TileMapLayer, coords: Vector2i, color: Vector2i):
 
 func _on_button_pressed() -> void:
 	print("_on_button_pressed")
+	AudioManager.create_2d_audio_at_location(
+		Vector2(0,0),
+		SoundEffect.SOUND_EFFECT_TYPE.GRAVITY)
 	gravity_down()
 	
 	
 func gravity_down() -> void:
 	print("gravity down")
-	
 	var placed_coords = placed_tiles.get_used_cells()
 	var per_x_coords: Dictionary = {}
 	for coord in placed_coords:
@@ -363,8 +379,8 @@ func gravity_down() -> void:
 			
 			var color = placed_tiles.get_cell_atlas_coords(old_coord)
 			var new_coord = Vector2i(x, int(HEIGHT/2)-i-1)
+			await get_tree().create_timer(0.001).timeout
 			for j in range(old_coord.y, new_coord.y ):
-				await get_tree().create_timer(0.001).timeout
 				placed_tiles.erase_cell(Vector2i(x, j))
 				draw_coords(placed_tiles, Vector2i(x, j+1), color)
 	
@@ -377,7 +393,11 @@ func gravity_down() -> void:
 			for n in range(num_gravity_repeats):
 				msg += "!"
 			msg += " x" + str(num_gravity_repeats)
-			
+		var sound_effect= SoundEffect.SOUND_EFFECT_TYPE.ON_AGAIN
+		AudioManager.sound_effect_dict[sound_effect].pitch_scale = 0.8 + (num_gravity_repeats / 10.0)
+		AudioManager.create_2d_audio_at_location(
+			Vector2(0,0),
+			sound_effect)
 		ScoreNumbers.display_str(
 					msg, 
 					Vector2(randi_range(-400, -100), randi_range(-100, 100)),
