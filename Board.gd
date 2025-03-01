@@ -2,7 +2,7 @@ extends Node2D
 const SPARKS = preload("res://sparks.tscn")
 const DEFAULT_LAYER = preload("res://default_layer.tscn")
 const MIN_TILES_TO_SCORE = 3
-const MAX_PIECE_SIZE = 12
+const MAX_PIECE_SIZE = 6
 const HEIGHT = 16
 const WIDTH = 24
 const MAIN_SOURCE_ID = 0
@@ -19,13 +19,13 @@ const ORANGE_TILE = Vector2i(5, 0)
 const BLUE_TILE = Vector2i(6, 0)
 const GREY_TILE = Vector2i(7, 0)
 const TILES = [
-	LIGHT_BLUE_TILE, 
+	#LIGHT_BLUE_TILE, 
 	YELLOW_TILE, 
 	GREEN_TILE, 
 	ORANGE_TILE, 
-	BLUE_TILE, 
-	RED_TILE,
-	PURPLE_TILE
+	#BLUE_TILE, 
+	#RED_TILE,
+	#PURPLE_TILE
 ]
 
 var border: TileMapLayer
@@ -171,13 +171,14 @@ func clear_scored_pieces() -> bool:
 					color_str = "#9A00CD"
 					
 				var score_coords = placed_tiles.map_to_local(neighbors[0])
-				for scored_tile in neighbors:
+				for i in range(neighbors.size()):
+					var scored_tile = neighbors[i]
 					await get_tree().create_timer(0.05).timeout
 					var sparks = SPARKS.instantiate()
 					add_child(sparks)
 					var global_coord = placed_tiles.to_global(placed_tiles.map_to_local(scored_tile))
 					var sound_effect = TILE_CLEAR_SOUNDS[randi_range(0, TILE_CLEAR_SOUNDS.size()-1)]
-					AudioManager.sound_effect_dict[sound_effect].pitch_scale = 0.4 + (score / 300.0)
+					AudioManager.sound_effect_dict[sound_effect].pitch_scale = 0.8 + (i / 8.0)
 					AudioManager.create_2d_audio_at_location(
 						global_coord, 
 						sound_effect)

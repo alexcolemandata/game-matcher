@@ -37,6 +37,6 @@ func display_str(str, position: Vector2, color: String, font_size: int):
 	
 
 func display_number(value: int, position: Vector2, color: String):
-	display_str("+"+str(value), position, color, value * 15)
+	display_str("+"+str(value), position, color, value * 10)
 	
 	
