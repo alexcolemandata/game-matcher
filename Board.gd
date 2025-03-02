@@ -63,6 +63,13 @@ func _input(event) -> void:
 			place_piece()
 			# clear_scored_pieces()
 			spawn_piece()
+		else:
+			print("unable to place")
+			AudioManager.create_2d_audio_at_location(
+				Vector2.ZERO,
+				SoundEffect.SOUND_EFFECT_TYPE.ON_UNABLE_TO_PLACE
+			)
+			
 	elif event.is_action_pressed("rotate anticlockwise"):
 		rotate_anticlockwise()
 	elif event.is_action_pressed("rotate clockwise"):
@@ -214,15 +221,14 @@ func clear_scored_pieces() -> bool:
 					sound_effect)
 				sparks.fire(global_coord, color)
 				placed_tiles.erase_cell(neighbor)
+				score += 1
+				%Score.text = str(score)
 			
 			ScoreNumbers.display_number(
 				neighbors.size(), 
 				global_coord + Vector2(0, -80), 
 				color,
 			) 
-		
-			score += scorable_pieces.size()
-			%Score.text = str(score)
 							
 	print("Total scored: ", scored_tiles.size())
 	
@@ -269,6 +275,10 @@ func rotate_piece(c_x: int, c_y: int) -> void:
 		
 		if border.get_cell_tile_data(new_coord):
 			print("unable to rotate ", c_x, c_y)
+			AudioManager.create_2d_audio_at_location(
+				Vector2.ZERO,
+				SoundEffect.SOUND_EFFECT_TYPE.ON_UNABLE_TO_PLACE
+			)
 			return 
 	
 		new_coords.append(new_coord)
@@ -284,7 +294,12 @@ func rotate_piece(c_x: int, c_y: int) -> void:
 			new_coords[i] = new_coords[i] + shift_amount
 			if border.get_cell_tile_data(new_coords[i]):
 				for j in range(piece_coords.size()):
-					draw_coords(active_piece, piece_coords[i], piece_colors[i])
+					draw_coords(active_piece, piece_coords[j], piece_colors[j])
+					
+				AudioManager.create_2d_audio_at_location(
+					Vector2.ZERO,
+					SoundEffect.SOUND_EFFECT_TYPE.ON_UNABLE_TO_PLACE
+				)
 					
 				return
 		for i in range(new_coords.size()):
@@ -407,7 +422,7 @@ func _on_button_pressed() -> void:
 		SoundEffect.SOUND_EFFECT_TYPE.GRAVITY)
 	%GravityDownButton.queue_free()
 	active_piece.clear()
-	clear_scored_pieces()
+	await clear_scored_pieces()
 	gravity_down()
 	
 	
@@ -447,6 +462,8 @@ func gravity_down() -> void:
 				placed_tiles.erase_cell(Vector2i(x, j))
 				draw_coords(placed_tiles, Vector2i(x, j+1), color)
 				
+	await glow_scorable_tiles()
+	await get_tree().create_timer(0.3).timeout
 	if await clear_scored_pieces():
 		print("scored pieces after applying gravity! repeating")
 		await get_tree().create_timer(0.2).timeout

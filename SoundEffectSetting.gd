@@ -10,6 +10,7 @@ enum SOUND_EFFECT_TYPE {
 	ON_AGAIN,
 	GRAVITY,
 	ON_PLACE,
+	ON_UNABLE_TO_PLACE,
 }
 
 @export_range(0, 10) var limit: int = 5 ## Maximum number of this SoundEffect to play simultaneously before culled.
