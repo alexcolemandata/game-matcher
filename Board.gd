@@ -171,7 +171,10 @@ func scorable_pieces_for_tile(tile: Vector2i) -> Array[Vector2i]:
 	return scorable_pieces
 	
 	
-			
+func stop_all_glows() -> void:
+	for coord in glow_coord.keys():
+		glow_coord[coord].stop_glow()
+		glow_coord.erase(coord)
 		
 func clear_scored_pieces() -> bool:
 	print("clear_scored_pieces")
@@ -207,10 +210,6 @@ func clear_scored_pieces() -> bool:
 					sound_effect)
 				sparks.fire(global_coord, color)
 				placed_tiles.erase_cell(neighbor)
-				
-				if glow_coord.has(neighbor):
-					glow_coord[neighbor].queue_free()
-					glow_coord.erase(neighbor)
 			
 			ScoreNumbers.display_number(
 				neighbors.size(), 
@@ -308,15 +307,16 @@ func place_piece() -> void:
 		
 func glow_scorable_tiles() -> void:
 	var scorable_coords: Array[Vector2i]
+	stop_all_glows()
 	for tile in TILES:
 		scorable_coords = scorable_pieces_for_tile(tile)
+		var newly_glowing_coords
 		for coord in scorable_coords:
-			var glow = TILEGLOW.instantiate()
-			add_child(glow)
-			
 			var global_coord = placed_tiles.to_global(placed_tiles.map_to_local(coord))
+			var glow = TILEGLOW.instantiate()
 			glow.glow(global_coord, color_of_tile(tile))
 			glow_coord[coord] = glow
+			add_child(glow)
 	return
 
 func spawn_piece() -> void:
@@ -395,6 +395,7 @@ func _on_button_pressed() -> void:
 	
 func gravity_down() -> void:
 	print("gravity down")
+	stop_all_glows()
 	var placed_coords = placed_tiles.get_used_cells()
 	var per_x_coords: Dictionary = {}
 	for coord in placed_coords:
