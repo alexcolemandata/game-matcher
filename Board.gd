@@ -8,8 +8,8 @@ const HEIGHT = 12
 const WIDTH = 16
 const MAIN_SOURCE_ID = 0
 
-const PLACABLE_MODULATION = Color(1, 1, 1, 0.6)
-const UNPLACABLE_MODULATION = Color(1, 1, 1, 0.1)
+const PLACABLE_MODULATION = Color(1, 1, 1, 0.9)
+const UNPLACABLE_MODULATION = Color(1, 1, 1, 0.2)
 
 const LIGHT_BLUE_TILE = Vector2i(0, 0)
 const PURPLE_TILE = Vector2i(1, 0)
@@ -47,7 +47,7 @@ func _ready():
 	
 	placed_tiles = DEFAULT_LAYER.instantiate()
 	active_piece = DEFAULT_LAYER.instantiate()
-	active_piece.modulate = Color(1, 1, 1, 0.3)
+	active_piece.modulate = Color(1, 1, 1, 0.6)
 	border = DEFAULT_LAYER.instantiate()
 	add_child(border)
 	add_child(placed_tiles)
@@ -178,6 +178,7 @@ func stop_all_glows() -> void:
 		
 func clear_scored_pieces() -> bool:
 	print("clear_scored_pieces")
+	set_piece_alpha()
 	var scored_tiles: Array[Vector2i] = []
 	stop_all_glows()
 	for color_to_check in TILES:
@@ -355,10 +356,12 @@ func spawn_piece() -> void:
 	print("spawned piece")
 	
 func set_piece_alpha():
+	active_piece.modulate = Color(1, 1, 1, 0.8)
+
 	if is_piece_placable():
-		active_piece.modulate = PLACABLE_MODULATION
+		placed_tiles.modulate = Color(1, 1, 1, 1)
 	else:
-		active_piece.modulate = UNPLACABLE_MODULATION
+		placed_tiles.modulate = UNPLACABLE_MODULATION
 		
 func can_move_in_direction(direction: Vector2i) -> bool:
 	for cell in active_piece.get_used_cells():
