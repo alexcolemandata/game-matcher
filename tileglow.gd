@@ -8,6 +8,7 @@ func glow(coord: Vector2, mod: Color = Color(1, 1, 1, 1)) -> void:
 
 func stop_glow():
 	print("stopping glow at position ", global_position)
+	await get_tree().create_timer(0.05).timeout
 	$Glow.emitting = false
 	queue_free()
 	return

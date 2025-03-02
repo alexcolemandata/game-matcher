@@ -2,7 +2,7 @@ extends Node2D
 const SPARKS = preload("res://sparks.tscn")
 const DEFAULT_LAYER = preload("res://default_layer.tscn")
 const TILEGLOW = preload("res://tileglow.tscn")
-const MIN_TILES_TO_SCORE = 4
+const MIN_TILES_TO_SCORE = 3
 const MAX_PIECE_SIZE = 5
 const HEIGHT = 12
 const WIDTH = 16
@@ -179,6 +179,7 @@ func stop_all_glows() -> void:
 func clear_scored_pieces() -> bool:
 	print("clear_scored_pieces")
 	var scored_tiles: Array[Vector2i] = []
+	stop_all_glows()
 	for color_to_check in TILES:
 		print("checking for scored color, ", color_to_check)
 		var scorable_pieces = scorable_pieces_for_tile(color_to_check)
@@ -193,10 +194,12 @@ func clear_scored_pieces() -> bool:
 			if scored_tile in scored_tiles:
 				continue
 				
+			await get_tree().create_timer(0.15).timeout
 			var to_check = scorable_pieces.duplicate()
 			var neighbors = get_tile_flood_fill(scored_tile, to_check)
 			var global_coord: Vector2 = Vector2.ZERO
 			for j in range(neighbors.size()):
+				await get_tree().create_timer(0.05).timeout
 				var neighbor = neighbors[j]
 				scored_tiles.append(neighbor)
 				await get_tree().create_timer(0.03).timeout
@@ -395,7 +398,6 @@ func _on_button_pressed() -> void:
 	
 func gravity_down() -> void:
 	print("gravity down")
-	stop_all_glows()
 	var placed_coords = placed_tiles.get_used_cells()
 	var per_x_coords: Dictionary = {}
 	for coord in placed_coords:
@@ -447,12 +449,13 @@ func gravity_down() -> void:
 					msg, 
 					Vector2(randi_range(-400, -100), randi_range(-100, 100)),
 					"#FFF",
-					70 + (15 * num_gravity_repeats)
+					40 + (12 * num_gravity_repeats)
 				)
 		await get_tree().create_timer(0.2).timeout
 		gravity_down()
 	else:
 		num_gravity_repeats = 0
+		await get_tree().create_timer(0.8).timeout
 		%GameOver.visible = true
 	pass
 

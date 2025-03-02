@@ -7,4 +7,7 @@ Music by Eric Matyas
 www.soundimage.org
 
 Sound Effects from Open Game Art
-https://opengameart.org
+www.opengameart.org
+
+Art by Kenney.nl 
+www.kenney.nl
