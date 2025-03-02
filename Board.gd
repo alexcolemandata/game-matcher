@@ -275,7 +275,20 @@ func rotate_piece(c_x: int, c_y: int) -> void:
 	active_piece.clear()
 	for i in range(new_coords.size()):
 		draw_coords(active_piece, new_coords[i], piece_colors[i])
-	
+		
+	var shift_amount = anchor_point - active_piece.get_used_rect().get_center()
+	if shift_amount != Vector2i.ZERO:
+		active_piece.clear()
+		for i in range(new_coords.size()):
+			new_coords[i] = new_coords[i] + shift_amount
+			if border.get_cell_tile_data(new_coords[i]):
+				for j in range(piece_coords.size()):
+					draw_coords(active_piece, piece_coords[i], piece_colors[i])
+					
+				return
+		for i in range(new_coords.size()):
+			draw_coords(active_piece, new_coords[i], piece_colors[i])
+			
 	set_piece_alpha()	
 	pass
 	
