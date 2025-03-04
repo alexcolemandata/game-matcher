@@ -76,10 +76,17 @@ func _input(event) -> void:
 		rotate_clockwise()
 	
 func is_piece_placable() -> bool:
-		for cell in get_piece_coords():
-			if placed_tiles.get_cell_tile_data(cell):
-				return false
-		return true
+	var piece_coords = get_piece_coords()
+	var piece_colors = get_layer_colors(active_piece)
+	for n in range(piece_coords.size()):
+		var piece_coord = piece_coords[n]
+		var piece_color = piece_colors[n]
+		
+		var placed_color = placed_tiles.get_cell_atlas_coords(piece_coord)
+		if not ((placed_color == Vector2i(-1, -1)) or (placed_color == piece_color)):
+			return false
+		
+	return true
 	
 		
 func input_handler(event_or_input) -> void:
